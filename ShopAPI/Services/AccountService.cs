@@ -17,6 +17,7 @@ namespace ShopAPI.Services
         private readonly IMainRepoistory<User> _mainRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ITokenService _tokenService;
 
         #endregion
 
@@ -28,11 +29,16 @@ namespace ShopAPI.Services
         /// <param name="mainRepository">Repository for user data access</param>
         /// <param name="unitOfWork">Unit of work for transaction management</param>
         /// <param name="mapper">AutoMapper instance for object mapping</param>
-        public AccountService(IMainRepoistory<User> mainRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public AccountService(
+            IMainRepoistory<User> mainRepository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ITokenService tokenService)
         {
             _mainRepository = mainRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
 
         #endregion
@@ -77,21 +83,26 @@ namespace ShopAPI.Services
         /// <exception cref="ArgumentNullException">Thrown when DTO is null</exception>
         /// <exception cref="ArgumentException">Thrown when email or password is invalid</exception>
         /// <remarks>Password comparison should use hashing in production environment</remarks>
-        public async Task<UserViewDto> LoginAsync(UserLoginDto dto)
+        public async Task<AuthResponseDto> LoginAsync(UserLoginDto dto)
         {
             if (dto.IsNullEntity())
                 throw new ArgumentNullException(nameof(dto));
 
             // Find user by email and password
             var users = await _mainRepository.GetAllAsync();
-            var user = users.FirstOrDefault(u =>
-                u.Email == dto.Email &&
-                u.PasswordHash == BCrypt.Net.BCrypt.HashPassword(dto.Password));
+            var user = users.FirstOrDefault(u => u.Email == dto.Email);
 
-            if (user.IsNotFound())
+            if (user.IsNotFound() || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 throw new ArgumentException("Invalid email or password");
 
-            return _mapper.Map<UserViewDto>(user);
+            var tokenResult = _tokenService.GenerateToken(user);
+
+            return new AuthResponseDto
+            {
+                Token = tokenResult.Token,
+                ExpiresAt = tokenResult.ExpiresAt,
+                User = _mapper.Map<UserViewDto>(user)
+            };
         }
 
         #endregion

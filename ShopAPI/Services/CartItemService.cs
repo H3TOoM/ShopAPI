@@ -49,8 +49,6 @@ namespace ShopAPI.Services
         /// <exception cref="ArgumentException">Thrown when cart ID is invalid</exception>
         public async Task<CartItemViewDto> CreateCartItemAsync(int cartId, CartItemCreateDto dto)
         {
-            if (dto.IsNullEntity())
-                throw new ArgumentNullException(nameof(dto));
 
             if (cartId.IsInValidId())
                 throw new ArgumentException("Invalid Cart ID!");

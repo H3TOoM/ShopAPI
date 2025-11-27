@@ -104,8 +104,6 @@ namespace ShopAPI.Services
             if (id.IsInValidId())
                 throw new ArgumentException("Invalid ID!");
 
-            if (dto.IsNullEntity())
-                throw new ArgumentNullException(nameof(dto));
 
             var user = await _mainRepository.GetByIdAsync(id);
             if (user.IsNotFound())

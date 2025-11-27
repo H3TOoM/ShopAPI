@@ -99,8 +99,6 @@ namespace ShopAPI.Services
             if (userId.IsInValidId())
                 throw new ArgumentException("Invalid User ID!");
 
-            if (cartItemDto.IsNullEntity())
-                throw new ArgumentNullException(nameof(cartItemDto));
 
             // Find cart by user ID
             var carts = await _mainRepository.GetAllAsync();

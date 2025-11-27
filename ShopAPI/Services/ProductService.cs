@@ -120,8 +120,6 @@ namespace ShopAPI.Services
             if (id.IsInValidId())
                 throw new ArgumentException("Invalid ID!");
 
-            if (dto.IsNullEntity())
-                throw new ArgumentNullException(nameof(dto));
 
             var product = await _mainRepository.GetByIdAsync(id);
             if (product.IsNotFound())

@@ -106,8 +106,6 @@ namespace ShopAPI.Services
             if (userId.IsInValidId())
                 throw new ArgumentException("Invalid User ID!");
 
-            if (dto.IsNullEntity())
-                throw new ArgumentNullException(nameof(dto));
 
             // Find address by user ID
             var addresses = await _mainRepository.GetAllAsync();

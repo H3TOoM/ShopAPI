@@ -99,9 +99,6 @@ namespace ShopAPI.Services
             if (id.IsInValidId())
                 throw new ArgumentException("Invalid ID!");
 
-            if (dto.IsNullEntity())
-                throw new ArgumentNullException(nameof(dto));
-
             var category = await _mainRepository.GetByIdAsync(id);
             if (category.IsNotFound())
                 throw new ArgumentException("Category Not Found");
